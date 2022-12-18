@@ -1,0 +1,12 @@
+.logo {
+    position: relative;
+    left: -40px;
+    width: 250px;
+    height: 70px;
+    margin-top: 2px!important;
+    top: 2px!important;
+  }
+  
+  #products-dropdown {
+    color: black;
+  }
