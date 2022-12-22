@@ -63,8 +63,6 @@ function NavMenu() {
   
       const clickSubmitLogin = (event) => {
         event.preventDefault();      
-        // console.log(username);
-        // console.log(currentpassword);
         
         if ((username == null) && (currentpassword == null)) {
             alert("please enter username and password");
