@@ -354,6 +354,8 @@ public class UserController : ControllerBase
                         accountIdentity: user.ToString(),
                         accountSecretKey: user.Secretkey
                     );
+                    // File(qrCode.QrCodeImageBytes, "image/png");
+
                     var res = _userService.TwoFactor(id,qrCode.QrCodeImage,model.Isenable);
                     return Ok(true);
                 }
@@ -381,8 +383,7 @@ public class UserController : ControllerBase
                     issuer: fullname,
                     accountIdentity: user.Id.ToString(),
                     accountSecretKey: user.Secretkey
-                );          
-                      
+                );                                
                 return Ok(qrcodeurl.QrCodeImage);
             }
             catch (AppException ex)

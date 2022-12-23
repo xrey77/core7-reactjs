@@ -44,7 +44,7 @@ namespace core7_reactjs.Entities
         [Column("isblocked")]
         public int Isblocked { get; set; }
         
-        // [Column("qrucodeurl"]
+        [Column("qrucodeurl")]
         public string Qrcodeurl { get; set; }
         
         [Column("otp")]

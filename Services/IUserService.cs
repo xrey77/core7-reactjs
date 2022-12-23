@@ -5,10 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using core7_reactjs.Helpers;
-using Microsoft.Extensions.Configuration;
-using NuGet.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Utilities;
 
 namespace core7_reactjs.Services
 {

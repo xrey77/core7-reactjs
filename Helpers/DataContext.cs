@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-// using Microsoft.Extensions.Configuration;
 using core7_reactjs.Entities;
 
 namespace core7_reactjs.Helpers
@@ -19,7 +18,6 @@ namespace core7_reactjs.Helpers
         }
 
         public DbSet<User> User { get; set; }
-        // public DbSet<Contact> Contacts {get; set;}
-        // public DbSet<CompanyServices> TServices { get; set; }
+        public DbSet<Product> Product {get; set;}
     }
 }

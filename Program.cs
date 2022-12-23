@@ -41,13 +41,11 @@ builder.Services.AddRazorPages();
 
 // configure DI for application services
 builder.Services.AddScoped<IUserService, UserService>();
-// builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 // builder.Services.AddScoped<IService, IServices>();
 
 //======GET SECRET FROM appsettings.json==================
 var settings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
-// var xkey = settings.Secret;
-// Console.WriteLine("Secret Key : " + xkey);
 var key = Encoding.ASCII.GetBytes(settings.Secret);
 //========================================================
 
