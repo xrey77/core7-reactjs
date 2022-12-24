@@ -1,10 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/images/ncr.jpg'
 import '../custom.css';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import { Nav, Navbar, NavDropdown, Row, Col, Form, Modal, Button} from 'react-bootstrap';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const api = axios.create({
     baseURL: "http://127.0.0.1:5006",
@@ -14,10 +15,15 @@ const api = axios.create({
   })
 
 function NavMenu() {
-    // var usernamex =  sessionStorage.getItem('USERNAME');
-    // var userpicture = sessionStorage.getItem('USERPIC');
-    // var userid = sessionStorage.getItem('USERID');
-    // var token = sessionStorage.getItem('TOKEN');
+    var usernameSession =  sessionStorage.getItem('USERNAME');
+    var userpicture = sessionStorage.getItem('USERPIC');
+    var userid = sessionStorage.getItem('USERID');
+    var token = sessionStorage.getItem('TOKEN');
+
+    useEffect(() => {
+
+        console.log("Exucute useEffect");
+      });
 
     const [lastname, setLastname] = useState("");
     const [firstname, setFirstname] = useState("");
@@ -42,7 +48,51 @@ function NavMenu() {
         e.preventDefault();
         setcurrentPassword(e.target.value);
       }
+      
+      const [show_2fa, setShow_2fa] = useState(false);
+      const [otpcode, setOtpcode] = useState("");
+      const [otp_msg, setOtp_msg] = useState("");
+
+      const close_2fa = () => {
+        setShow_2fa(false);
+        handleLogOut(); 
+      }
+
+      const handleLogOut = () => {
+        usernameSession = null;
+        userpicture = null;
+        sessionStorage.removeItem('USERNAME');
+        sessionStorage.removeItem('TOKEN');
+        sessionStorage.removeItem('USERID');
+        sessionStorage.removeItem('ROLE');
+        sessionStorage.removeItem('USERPIC');
+        sessionStorage.clear();
+        window.location="/";
+      }
   
+      const verifyOTP = (e) => {
+        e.preventDefault();
+        api.put("/validatetoken/" + userid + "/"+otpcode, null, {headers: {
+            Authorization: `Bearer ${token}`
+        }})
+        .then((res) => {
+            if (res.data.message != null) {
+                setOtp_msg(res.data.message);
+                return;
+            }
+            console.log(res.data.users.username);
+            
+            sessionStorage.setItem('USERNAME',res.data.users.username);
+            sessionStorage.setItem('USERPIC',res.data.users.userpicture);
+            setShow_2fa(false);
+
+            }, (error) => {
+              setOtp_msg("Invalid OTP Code.");
+              console.log("May Error : " + error.message);
+              return;
+        });
+    }
+
       const handleLoginClose = () => {
         setUsername("");
         setcurrentPassword("");
@@ -80,19 +130,19 @@ function NavMenu() {
                   setloginMessage(res.data.username + ", " + res.data.password);
                   return;
                 }
-                // if (res.data.otp > 0) {
-                //   setLoginShow(false);  
-                //   sessionStorage.setItem('USERID',res.data.id);
-                //   sessionStorage.setItem('TOKEN',res.data.token);
-                //   sessionStorage.setItem('ROLE',res.data.role);
-                // } else {
-                //   sessionStorage.setItem('TOKEN',res.data.token);
-                //   sessionStorage.setItem('USERID',res.data.id);
-                //   sessionStorage.setItem('USERNAME',res.data.username);
-                //   sessionStorage.setItem('ROLE',res.data.role);
-                //   sessionStorage.setItem('USERPIC',res.data.userpicture);
-                //   setLoginShow(false);  
-                // }
+                if (res.data.otp > 0) {
+                  setLoginShow(false);  
+                  sessionStorage.setItem('USERID',res.data.id);
+                  sessionStorage.setItem('TOKEN',res.data.token);
+                  sessionStorage.setItem('ROLE',res.data.role);
+                } else {
+                  sessionStorage.setItem('TOKEN',res.data.token);
+                  sessionStorage.setItem('USERID',res.data.id);
+                  sessionStorage.setItem('USERNAME',res.data.username);
+                  sessionStorage.setItem('ROLE',res.data.role);
+                  sessionStorage.setItem('USERPIC',res.data.userpicture);
+                  setLoginShow(false);  
+                }
   
               }, (error) => {
   
@@ -116,7 +166,7 @@ function NavMenu() {
         });
       }
   
-
+      
 
     return (
         <Container fluid>
@@ -224,15 +274,13 @@ function NavMenu() {
 
             <Row>
                 <Col>
-                    {/* USER LOGIN */}
                     <Modal
                         size="sm"
                         show={showlogin}
                         onHide={handleLoginClose}
                         backdrop="static"
                         keyboard={false}
-                        centered
-                    >
+                        centered>
                         <Modal.Header closeButton className="modal-login">
                             <Modal.Title>&#128275; Account Login</Modal.Title>
                         </Modal.Header>
@@ -266,7 +314,6 @@ function NavMenu() {
                         <div id="loginMsg" name="loginMsg" className='w-100 text-left text-danger' style={{fontSize: 12}}>{loginmsg}</div>
                         </Modal.Footer>
                     </Modal>
-
                 </Col>
             </Row>
             <Row>
@@ -293,21 +340,70 @@ function NavMenu() {
                 </Nav>
 
                 <Nav className='mr-1'>
-                  <>
-                    <Nav.Link onClick={() => setLoginShow(true)} className="text-dark item-r" id="login">Login</Nav.Link>
-                    <Nav.Link onClick={() => setRegisterShow(true)} className="text-dark item-r" id="register">Register</Nav.Link>  
-                  </>
+                    {
+                        usernameSession ? 
+                          <>
+                            <img src={userpicture} className='usrpic' alt="'" />
+                            <NavDropdown className="text-white item-r" title={usernameSession} id="basic-nav-dropdown">
+                            
+                            <NavDropdown.Item onClick={() => handleLogOut()} className='drop-size'>LogOut</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item className='drop-size' as={Link} to="/profile">Profile</NavDropdown.Item>
+                            </NavDropdown>
+                          </>
+                    :
+                    <>
+                            <Nav.Link onClick={() => setLoginShow(true)} className="text-dark item-r" id="login">Login</Nav.Link>
+                            <Nav.Link onClick={() => setRegisterShow(true)} className="text-dark item-r" id="register">Register</Nav.Link>  
+                            </>                          
+                    }
+                    
                 </Nav>
 
                 </Navbar.Collapse>
 
             </Container>
 
-
             </Navbar>
 
             </Col>
-            </Row>            
+            </Row>           
+            <Row>
+                <Col>
+                  <Modal 
+                    show={show_2fa} 
+                    size="sm"
+                    centered
+                    onHide={close_2fa} 
+                    animation={false}>
+                    <Modal.Header closeButton className='bg-warning'>
+                    <Modal.Title className='text-white mfa-size'>2-Factor Authentication</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+
+                    <Form>
+                    <Form.Group className="mb-3" id="otpcode">
+                        <Form.Label>Enter 6 digits OTP Code</Form.Label>
+                        <Form.Control 
+                        required
+                        defaultValue={otpcode}
+                        onChange={e => setOtpcode(e.target.value)}
+                        type="text" />
+                    </Form.Group>
+                    <Button variant="warning" className='text-white' onClick={verifyOTP}>
+                        verify
+                    </Button>
+
+                    </Form>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <div className='w-100 text-left text-danger mfa-msg'>{otp_msg}</div>
+                    </Modal.Footer>
+                </Modal>
+                
+                </Col>
+            </Row> 
         </Container>
 
         );

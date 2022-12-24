@@ -67,6 +67,5 @@ namespace core7_reactjs.Entities
         [DisplayFormat(DataFormatString = "{0:MM/dd/yy H:mm:ss}")]
         [DataType(DataType.Date)]
         public DateTime? Updatedat { get; set; }
-        //{0:MM/dd/yy H:mm:ss zzz}
     }
 }

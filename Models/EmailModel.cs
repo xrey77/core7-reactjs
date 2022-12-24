@@ -6,7 +6,5 @@ namespace core7_reactjs.Models
         public string Subject { get; set; }
         public string Body { get; set; }
         public IFormFile Attachment { get; set; }
-//        public string Email { get; set; }
-//        public string Password { get; set; }        
     }    
 }

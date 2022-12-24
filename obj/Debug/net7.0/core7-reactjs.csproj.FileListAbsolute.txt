@@ -295,3 +295,12 @@
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/QRCoder.dll
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/AspNetCore.Totp.dll
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/AspNetCore.Totp.Interface.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.Connections.Abstractions.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.Http.Connections.Client.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.Http.Connections.Common.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.SignalR.Client.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.SignalR.Client.Core.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.SignalR.Common.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/Microsoft.Extensions.Features.dll
+/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/System.Net.WebSockets.WebSocketProtocol.dll

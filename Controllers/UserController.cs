@@ -12,9 +12,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using System.Net.Http.Headers;
+// using System.Net.Http.Headers;
 using MailKit.Net.Smtp;
-using Google.Authenticator;
+// using Google.Authenticator;
 using AspNetCore.Totp;
 using AspNetCore.Totp.Interface;
 
@@ -423,5 +423,6 @@ public class UserController : ControllerBase
         //         _urlEncoder.Encode(email),
         //         unformattedKey);
         // }
+
 
 }

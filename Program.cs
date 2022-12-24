@@ -1,11 +1,11 @@
 using System.Text;
 using core7_reactjs.Helpers;
 using core7_reactjs.Services;
+using core7_reactjs.SignalRChat.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +24,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSignalR();
 
 
 builder.Services.Configure<FormOptions>(o =>
@@ -153,6 +153,7 @@ app.UseSpa(spa =>
 app.MapControllers();
 // app.UseEndpoints(endpoints => endpoints.MapControllers());
 
+app.MapHub<ChatHub>("/chatHub");
 app.Run();
 
 

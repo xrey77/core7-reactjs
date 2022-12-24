@@ -9,6 +9,7 @@ import prod6 from '../assets/images/prod6.png';
 import prod7 from '../assets/images/prod7.png';
 
 export class Home extends Component {
+    
     render() {
         return(
             <Container fluid>
