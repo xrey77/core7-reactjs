@@ -10,7 +10,7 @@ const api = axios.create({
   })
   
 
-function Login() {
+const Login = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");

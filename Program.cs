@@ -1,5 +1,6 @@
 using System.Text;
 using core7_reactjs.Helpers;
+using core7_reactjs.models;
 using core7_reactjs.Services;
 using core7_reactjs.SignalRChat.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,8 +16,6 @@ if (builder.Environment.IsProduction()) {
 } else {
     builder.Services.AddDbContext<DataContext, SQLDataContext>();
 }
-// Add services to the container.
-builder.Services.AddCors();
 builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -24,8 +23,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR();
-
 
 builder.Services.Configure<FormOptions>(o =>
 {
@@ -34,15 +31,31 @@ builder.Services.Configure<FormOptions>(o =>
     o.MemoryBufferThreshold = int.MaxValue;
 });
 
-
-
 builder.Services.AddSpaStaticFiles(options => { options.RootPath = "clientapp/build"; });
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 
 // configure DI for application services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 // builder.Services.AddScoped<IService, IServices>();
+
+
+// ADD CROSS-ORIGIN RESOURCE SHARING (CORS)
+builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .WithMethods("GET", "POST")
+                .AllowCredentials();
+        });
+});
+
+builder.Services.AddSingleton<IDictionary<string,ChatModel>>(opts => new Dictionary<string, ChatModel>());
 
 //======GET SECRET FROM appsettings.json==================
 var settings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
@@ -91,8 +104,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // app.UseSwagger();
+    // app.UseSwaggerUI();
     app.UseHsts();    
 }
 
@@ -120,14 +133,19 @@ app.UseStatusCodePages(async context =>
 //============================================================
 
 
-
 // app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors(x => x
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
+app.UseCors();
+
+app.UseCors("ClientPermission");
+// app.UseCors(x => x
+//         .AllowAnyMethod()
+//         .AllowAnyHeader()
+//         .SetIsOriginAllowed(origin => true) // allow any origin
+//         .AllowCredentials()); // allow credentials
+
+
 app.UseSpaStaticFiles();
 
 //SERVE STATIC FILES =====================================
@@ -138,7 +156,6 @@ app.UseStaticFiles(new StaticFileOptions()
 });
 //=========================================================
 app.UseAuthorization();
-app.MapRazorPages();
 
 // =======LOAD REACTJS============================
 app.UseSpa(spa =>
@@ -151,9 +168,12 @@ app.UseSpa(spa =>
 //=================================================
 
 app.MapControllers();
-// app.UseEndpoints(endpoints => endpoints.MapControllers());
+// app.UseEndpoints(endpoints => endpoints.MapHub<ChatHub>("/chat"));
 
-app.MapHub<ChatHub>("/chatHub");
+// app.UseEndpoints(endpoints => endpoints.MapControllers());
+    // endpoints.MapHub<ChatHub>("/chat");
+app.MapRazorPages();
+app.MapHub<ChatHub>("/chatclient");
 app.Run();
 
 

@@ -14,6 +14,7 @@ namespace core7_reactjs.Services
         IEnumerable<User> GetAll();
         User GetById(int id);
         string GetEmailAdd(string uname);
+        string GetUsername(string usrname);
         string GetoldProfilepic(int idno);
         string GetTOTP(int idno);
         User Create(User user, string password);
@@ -316,6 +317,13 @@ namespace core7_reactjs.Services
         public string GetTOTP(int idno) {
             var user = _context.User.Find(idno);
            return user.Qrcodeurl;
+        }
+        public string GetUsername(string usrname) {
+            var uname = _context.User.AsQueryable().FirstOrDefault(c => c.Username == usrname);
+            if (uname == null) {
+                throw new AppException("There is no recipient by that name");
+            }
+           return uname.Username;
         }
 
 

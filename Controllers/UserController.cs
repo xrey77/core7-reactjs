@@ -17,6 +17,9 @@ using MailKit.Net.Smtp;
 // using Google.Authenticator;
 using AspNetCore.Totp;
 using AspNetCore.Totp.Interface;
+// using core7_reactjs.models;
+// using Microsoft.AspNetCore.SignalR;
+// using Microsoft.AspNetCore.SignalR;
 
 namespace core7_reactjs.Controllers;
 
@@ -30,19 +33,15 @@ public class UserController : ControllerBase
         .AddEnvironmentVariables()
         .Build();
 
-        // private readonly ITotpValidator _totpValidator;
+
         private readonly ITotpGenerator _totpGenerator;
         private readonly ITotpSetupGenerator _totpQrGenerator;
         private readonly ITotpValidator _totpValidator;        
 
         private IUserService _userService;
         private IMapper _mapper;
-        // private readonly AppSettings _appSettings;
-
+ 
         private readonly IWebHostEnvironment env;
-
-
-    // private readonly ILogger<UserController> _logger;
 
         public UserController(
                 IUserService userService,
@@ -56,10 +55,8 @@ public class UserController : ControllerBase
 
             _userService = userService;
                 _mapper = mapper;
-                // _appSettings = appSettings.Value;
                 env = _env;        
         }
-
 
         [AllowAnonymous]
         [HttpPost("/login")]
@@ -95,16 +92,12 @@ public class UserController : ControllerBase
                 Username = user.Username,
                 FirstName = user.Firstname,
                 LastName = user.Lastname,
+                Otp =user.Otp,
                 role = user.Role,
                 isotpenabled = user.Twofactorenabled,
                 Token = tokenString,
                 profilepic = user.Profilepic
             });
-
-
-
-
-            // return Ok(model);
         }
 
         [AllowAnonymous]
@@ -406,6 +399,24 @@ public class UserController : ControllerBase
             }
         }
 
+        // [AllowAnonymous]
+        // [HttpPost("/chat")]
+        // public async Task<IActionResult> Chat([FromBody]ChatModel model)
+        // {
+        //     var uname = model.recipient;
+
+        //     try {
+        //         var user = _userService.GetUsername(uname);
+        //         // await _clients.All.SendAsync("ReceiveMessage", model.recipient, model.chatmessage);
+
+        //         return Ok(new {recipient = model.recipient, message = model.chatmessage});
+        //    }
+        //     catch (AppException ex)
+        //     {
+        //         return BadRequest(new { message = ex.Message });
+        //     }
+        // }
+
        public static string Base64Decode(string base64EncodedData) {
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
@@ -423,6 +434,5 @@ public class UserController : ControllerBase
         //         _urlEncoder.Encode(email),
         //         unformattedKey);
         // }
-
 
 }

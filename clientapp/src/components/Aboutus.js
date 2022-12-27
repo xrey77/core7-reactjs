@@ -1,9 +1,17 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { Container, Row, Col } from 'react-bootstrap';
+import NavMenu from './NavMenu';
 
-export class Aboutus extends Component {
-    render() {
+const Aboutus = () => {
         return(
-            <h1>About Us</h1>
+            <Container fluid>
+                <Row>
+                    <Col>
+                        <h1>About Us</h1>                    
+                    </Col>
+                </Row>
+            </Container>
         );
-    }
 }
+
+export default Aboutus;

@@ -16,3 +16,34 @@ export class Layout extends Component {
     );
   }
 }
+
+// const Layout = () => {
+//   // static displayName = Layout.name;
+
+//     /* eslint-disable */
+//     const [connection, setConnection] = useState();
+
+//     const joinRoom = async (user, room) => {
+
+    
+//       try {
+    
+//         const connection = new HubConnectionBuilder()
+//         .withUrl("http://127.0.0.1:5006/chat")
+//         .configureLoggin(LogLevel.Information)
+//         .build();
+    
+//         connection.on("ReceivedMessage", (user, message) => {
+//           console.log("message received : ", message);
+//         });
+        
+//         await connection.start();
+//         await connection.invoke("JoinRoom", {user, room});
+//         setConnection(connection);
+    
+//       } catch(e) {
+//         console.log(e);
+//       }
+//     }
+  
+

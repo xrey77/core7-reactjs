@@ -1,6 +1,5 @@
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/appsettings.Development.json
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/appsettings.json
-/Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/clientapp/build/asset-manifest.json
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/clientapp/build/manifest.json
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/clientapp/package-lock.json
 /Users/reynald/My-Programs/DotnetCore/core7-reactjs/bin/Debug/net7.0/clientapp/package.json

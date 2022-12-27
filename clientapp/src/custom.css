@@ -10,3 +10,268 @@
   #products-dropdown {
     color: black;
   }
+
+  .usrpic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .col1 {
+    width: 200px;
+  }
+
+  .col-msg {
+    width: 550px;
+  }
+  .col-btn {
+    width: 50px;
+  }
+
+  .bg-chat {
+    background-color:darkkhaki
+  }
+
+.bg-users {
+  background-color:blanchedalmond;
+  color: black;
+}
+.bg-white {
+  background-color: #fff
+}
+.border-white {
+  border-color: white;
+}
+.full-width {
+  max-width: 107%!important;
+  width: 107%!important;
+  margin-left: -10px!important;
+  background-color:orange;
+}
+.full-carousel {
+  max-width: 107%!important;
+  width: 107%!important;
+  margin-left: -15px!important;
+}
+.bg-nav {
+  background-color: orange;
+}
+
+.ul-2 {
+  margin-right: 50px!important;
+}
+
+.w-50 {
+  text-align: center;
+  margin-left: -10px;
+}
+.w-200 {
+  margin-top: -20px;
+  width: 150px!important;
+}
+.room {
+  font-weight: bold;
+}
+@media (max-width: 1280px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .ul-2 {
+    margin-right: 200px!important;
+  }
+  
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;
+    
+  }
+  
+}
+
+/* @media (min-width: 1200px) { 
+  .ul-1 {
+    margin-left: -50px!important;
+  }  
+} */
+
+@media (max-width: 1200px) { 
+  .ul-1 {
+    margin-left: -50px!important;
+    background-color: white;
+  }  
+  .ul-2 {
+    margin-right: 100px!important;
+  }  
+}
+
+@media (max-width: 1900px) { 
+  .ul-1 {
+    margin-left: -50px!important;
+  }  
+  .ul-2 {
+    margin-right: 150px!important;
+  }  
+}
+@media (max-width: 1700px) { 
+  .ul-1 {
+    margin-left: -50px!important;
+  }  
+  .hamburger {
+    margin-right: 50px!important;
+  }
+  
+  /* .ul-2 {
+    margin-right: 150px!important;
+  }   */
+}
+
+
+/* @media (min-width: 1200px) and (max-width: 767.98px) {  */
+
+  /* SURFACE PRO 7 */
+  @media (max-width: 912.98px) { 
+    .ul-1 {
+      color: blue;
+      margin-left: 0px!important;
+    }  
+   .hamburger {
+    margin-right: 80px!important;
+   }
+    .ul-2 {
+      margin-right: 90!important;
+    }    
+  }
+
+  /* IPAD AIR */
+  @media (max-width: 820px) { 
+    .ul-1 {
+      color: blue;
+      margin-left: 0px!important;
+    }  
+   .hamburger {
+    visibility: visible;
+    margin-right: 100px!important;
+   }
+   .logo {
+    width: 150px;
+   }
+
+   /* .ul-2 {
+      margin-right: 90!important;
+    }     */
+  }
+  
+/* IPAD MINI */
+@media (max-width: 768.98px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .hamburger {
+    margin-right: 90px!important;
+   }
+
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;    
+  }
+}
+
+/* SAMSUNG GALAXY A5/71 */
+@media (max-width: 412px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .hamburger {
+    margin-right: 50px!important;
+   }
+   .logo {
+    width: 150px;
+   }
+
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;    
+  }  
+}
+
+/* SURFACE DUO */
+@media (max-width: 540.98px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .hamburger {
+    margin-right: 50px!important;
+   }
+
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;    
+  }  
+}
+
+/* GALAXY FOLD */
+@media (max-width: 280.98px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .hamburger {
+    margin-right: 0px!important;
+   }
+   .logo {
+    width: 150px;
+   }
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;    
+  } 
+}
+
+/* GALAXY S5 */
+@media (max-width: 360px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .hamburger {
+    margin-right: 10px!important;
+   }
+   .logo {
+    width: 150px;
+   }
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;    
+  }  
+}
+
+/* PIXEL 2, PIXEL 2 XL */
+@media (max-width: 411px) { 
+  .ul-1 {
+    color: blue;
+    margin-left: 0px!important;
+  }  
+  .hamburger {
+    margin-right: 20px!important;
+   }
+   .logo {
+    width: 150px;
+   }
+
+  .full-carousel {
+    max-width: 110%!important;
+    width: 110%!important;
+    margin-left: -12px!important;    
+  }  
+}
+

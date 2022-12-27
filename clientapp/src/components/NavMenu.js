@@ -1,35 +1,92 @@
+import { HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/images/ncr.jpg'
 import '../custom.css';
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import Container from 'react-bootstrap/Container';
-import { Nav, Navbar, NavDropdown, Row, Col, Form, Modal, Button} from 'react-bootstrap';
+import { Table, Nav, Navbar, NavDropdown, Row, Col, Form, Modal, Button} from 'react-bootstrap';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import '../App';
 
 const api = axios.create({
     baseURL: "http://127.0.0.1:5006",
     headers: {'Accept': 'application/json',
-              'Content-Type': 'application/json'}
-            //   'Authorization': 'inherit'},
+              'Content-Type': 'application/json',
+              'Authorization': 'inherit'}
   })
 
-function NavMenu() {
-    var usernameSession =  sessionStorage.getItem('USERNAME');
-    var userpicture = sessionStorage.getItem('USERPIC');
-    var userid = sessionStorage.getItem('USERID');
-    var token = sessionStorage.getItem('TOKEN');
+const NavMenu = () => {
+
+
+    const [UserNamex, setUsernamex] = useState("");
+    const [UserPicture, setUserPicture] = useState("");
+    const [UserId, setUserId] = useState("");
+    const [UserToken, setUserToken] = useState("");
+
+    //FOR CHAT
+    const [user, setUser] = useState("");
+    const [room, setRoom] = useState("");
+    const [messages, setMesssages] = useState("");
+    const [messagelist, setMesssagelist] = useState("");
+
+    const [chatconnection, setChatConnection] = useState();
+    
+    const connection = new HubConnectionBuilder()
+    .withUrl("http://localhost:5006/chatclient")
+    .configureLogging(LogLevel.Information)
+    .build();
+
+    async function start() {
+        try {
+            await connection.start();
+            console.log("SignalR Connected.");
+        } catch (err) {
+            console.log("May Error!");
+        }
+    };
+
+    const joinRoom = async (user1, room1) => {
+        connection.onclose(async () => {
+            await start();
+        });
+        
+        connection.on("ReceiveMessage", (user1, message) => {
+            console.log("user....",user1);
+            console.log("new msg...." + message);
+
+            // setMesssagelist(messages => [...messages, {user1, message1}]);
+            // setRoom(user1);
+            // setRoom(room1)            
+          });
+  
+        await start();
+
+        try {
+            await connection.invoke("JoinRoom", {user1, room});
+            console.log("new room : ", room);
+            setRoom(room1);
+        } catch (err) {
+            console.log("Hindi ma-join and user....");
+        }
+        setChatConnection(connection);
+    }
 
     useEffect(() => {
+        if (window.sessionStorage.getItem('USERNAME') != null) {
+            setUsernamex(window.sessionStorage.getItem('USERNAME'));
+            setUserPicture(window.sessionStorage.getItem('USERPIC'));
+            setUserId(window.sessionStorage.getItem('USERID'));
+            setUserToken(window.sessionStorage.getItem('TOKEN')); 
+        }
+    }, []);
 
-        console.log("Exucute useEffect");
-      });
 
     const [lastname, setLastname] = useState("");
     const [firstname, setFirstname] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
-
 
     const [username, setUsername] = useState("");
     const [currentpassword, setcurrentPassword] = useState("");
@@ -38,42 +95,71 @@ function NavMenu() {
 
     const [showlogin, setLoginShow] = useState(false);
     const [showregister, setRegisterShow] = useState(false);
+    const [showChat, setchatShow] = useState(false);
+    // const [chatmessage, setChatMessage] = useState("");
+    const [chatrecipient, setChatRecipiend] = useState("");
+    // const [chatErrorMsg, setChatErrorMsg] = useState("");
+
+    const [show_2fa, setShow_2fa] = useState(false);
+    const [otpcode, setOtpcode] = useState("");
+    const [otp_msg, setOtp_msg] = useState("");
 
     const submitUsernameChange = (e) => {
         e.preventDefault();
         setUsername(e.target.value);
-      }
+    }
   
-      const submitPasswordChange = (e) => {
+    const submitPasswordChange = (e) => {
         e.preventDefault();
         setcurrentPassword(e.target.value);
-      }
-      
-      const [show_2fa, setShow_2fa] = useState(false);
-      const [otpcode, setOtpcode] = useState("");
-      const [otp_msg, setOtp_msg] = useState("");
+    }
 
-      const close_2fa = () => {
+    const showChatbox = () => {
+        setchatShow(true);
+        setUser(window.sessionStorage.getItem('USERNAME'));
+        setRoom(window.sessionStorage.getItem('ROOM'));
+        setMesssagelist(window.sessionStorage.getItem('USERNAME') + " has joined the " + window.sessionStorage.getItem('ROOM'));
+
+    }
+
+    const closeChatbox = () => {
+        setchatShow(false);
+        
+    }
+
+    const sendChatmessage = async(msg) => {
+        try {
+            await chatconnection.invoke("SendMessage", msg);
+            setMesssagelist(msg);
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    const close_2fa = () => {
         setShow_2fa(false);
         handleLogOut(); 
-      }
+    }
 
-      const handleLogOut = () => {
-        usernameSession = null;
-        userpicture = null;
+    const handleLogOut = () => {
+        setUsernamex("");
+        setUserPicture("");
         sessionStorage.removeItem('USERNAME');
         sessionStorage.removeItem('TOKEN');
         sessionStorage.removeItem('USERID');
         sessionStorage.removeItem('ROLE');
         sessionStorage.removeItem('USERPIC');
+        sessionStorage.removeItem('ROOM');
+        sessionStorage.removeItem('USER');
+        sessionStorage.removeItem('MSG');
         sessionStorage.clear();
         window.location="/";
-      }
+    }
   
-      const verifyOTP = (e) => {
+    const verifyOTP = (e) => {
         e.preventDefault();
-        api.put("/validatetoken/" + userid + "/"+otpcode, null, {headers: {
-            Authorization: `Bearer ${token}`
+        api.put("/validatetoken/" + UserId + "/"+otpcode, null, {headers: {
+            Authorization: `Bearer ${UserToken}`
         }})
         .then((res) => {
             if (res.data.message != null) {
@@ -88,19 +174,19 @@ function NavMenu() {
 
             }, (error) => {
               setOtp_msg("Invalid OTP Code.");
-              console.log("May Error : " + error.message);
+              console.log("May Error : " + error);
               return;
         });
     }
 
-      const handleLoginClose = () => {
+    const handleLoginClose = () => {
         setUsername("");
         setcurrentPassword("");
-        setLoginShow("");
+        setLoginShow(false);
         setloginMessage("");
-      }
+    }
   
-      const handleRegisterClose = () => {
+    const handleRegisterClose = () => {
         setUsername("");
         setcurrentPassword("");
         setLastname("");
@@ -109,51 +195,65 @@ function NavMenu() {
         setMobile("");
         setregisterMessage("");
         setRegisterShow(false);
-      }
+    }
   
-      const clickSubmitLogin = (event) => {
-        event.preventDefault();      
-        
+    const clickSubmitLogin = (e) => {        
+        e.preventDefault();    
         if ((username == null) && (currentpassword == null)) {
             alert("please enter username and password");
-           return;
+            return;
         } else {
   
-          const formData =JSON.stringify({ username: username, password: currentpassword });   
+           const formData =JSON.stringify({ username: username, password: currentpassword });   
      
         //   const formData = new FormData();
         //   formData.append("username", username);
         //   formData.append("password", currentpassword);
           api.post("/login", formData)
              .then((res) => {    
-               if (res.data.username != null) {
-                  setloginMessage(res.data.username + ", " + res.data.password);
+               if (res.data.username == null) {
+                  setloginMessage("Please enter your username");
                   return;
+                } else {                    
+                    if (res.data.otp > 0) {
+
+                        setLoginShow(false);  
+                        sessionStorage.setItem('USERID',res.data.id);
+                        sessionStorage.setItem('TOKEN',res.data.token);
+                        sessionStorage.setItem('ROLE',res.data.role);
+                        setShow_2fa(true);
+                        // JOIN CHATROOM
+                        // setUser(res.data.username);
+                        // setRoom("Reynald Room");
+                        // joinRoom(user, room);
+            
+                    } else {
+
+                    window.sessionStorage.setItem('USERID',res.data.id);
+                    window.sessionStorage.setItem('USERNAME',res.data.username);
+                    window.sessionStorage.setItem('TOKEN',res.data.token);
+                    window.sessionStorage.setItem('ROLE',res.data.role);
+                    window.sessionStorage.setItem('USERPIC',res.data.profilepic);
+                    setLoginShow(false);  
+
+                    // JOIN CHATROOM
+                    joinRoom(window.sessionStorage.getItem('USERNAME'));
+                    window.sessionStorage.setItem('ROOM',"Room");
+                    setUser(window.sessionStorage.getItem('USERNAME'));
+                    window.location.href="http://localhost:3000";
+
+
+                    }
                 }
-                if (res.data.otp > 0) {
-                  setLoginShow(false);  
-                  sessionStorage.setItem('USERID',res.data.id);
-                  sessionStorage.setItem('TOKEN',res.data.token);
-                  sessionStorage.setItem('ROLE',res.data.role);
-                } else {
-                  sessionStorage.setItem('TOKEN',res.data.token);
-                  sessionStorage.setItem('USERID',res.data.id);
-                  sessionStorage.setItem('USERNAME',res.data.username);
-                  sessionStorage.setItem('ROLE',res.data.role);
-                  sessionStorage.setItem('USERPIC',res.data.userpicture);
-                  setLoginShow(false);  
-                }
-  
-              }, (error) => {
-  
-              setloginMessage(error.message);         
-              return;
+              }, (error) => {  
+                setloginMessage(error);         
+                return;
           });
         }
         return;
-      };
+    };
 
-      const clickSubmitRegister = (e) => {
+    const clickSubmitRegister = (e) => {
         e.preventDefault();
         const data =JSON.stringify({ lastname: lastname, firstname: firstname, email: email, username: username, password: currentpassword, mobile: mobile });
         api.post("/user/register", data)
@@ -162,22 +262,21 @@ function NavMenu() {
                 setregisterMessage(res.data.message);
               }            
             }, (error) => {
-              setregisterMessage(error.message);
+              setregisterMessage(error);
         });
-      }
+    }
   
       
-
     return (
-        <Container fluid>
+        <Container className='full-width'>
             <Row>
                 <Col>
                     {/* USER REGISTRATION */}
                     <Modal
+                    backdrop="static"
                     size="sm"
                     show={showregister}
                     onHide={handleRegisterClose}
-                    backdrop="static"
                     keyboard={false}
                     centered
                 >
@@ -185,76 +284,83 @@ function NavMenu() {
                     <Modal.Title>&#9997; Register</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form autoComplete='off'>
+                        <Form>
                         <div className='row'>
                         <div className='col'>
-                            <Form.Group className="mb-3" id="firstname">
+                            <Form.Group className="mb-3" controlId='firstname'>
                                 <Form.Label>First Name</Form.Label>
                                 <Form.Control 
+                                type="text" 
                                 required
                                 defaultValue={lastname}
+                                autoComplete="false"
                                 name="lastname"
                                 onChange={e => setLastname(e.target.value)}
-                                type="text" 
                                 />
                             </Form.Group>
                         </div>
                         <div className='col'>
-                            <Form.Group className="mb-3" id="lastname">
+                            <Form.Group className="mb-3" controlId='lastname'>
                                 <Form.Label>Lastname</Form.Label>
                                 <Form.Control 
+                                type="text" 
                                 required
                                 defaultValue={firstname}
+                                autoComplete="false"
                                 name="firstname"
                                 onChange={e => setFirstname(e.target.value)}
-                                type="text" 
                                 />
                             </Form.Group>        
                         </div>        
                         </div>
-                        <Form.Group className="mb-3" id="email">
+                        <Form.Group className="mb-3" controlId='email'>
                             <Form.Label>Email Address</Form.Label>
                             <Form.Control 
+                            type="email" 
                             required={true}
                             defaultValue={email}
+                            autoComplete="false"
                             name="email"
                             onChange={e => setEmail(e.target.value)}
-                            type="email" 
                             />
                         </Form.Group>        
-                        <Form.Group className="mb-3" id="mobile">
+                        <Form.Group className="mb-3" controlId='mobile'>
                             <Form.Label>Mobile No.</Form.Label>
                             <Form.Control
+                            type="text" 
                             required
                             defaultValue={mobile}
+                            autoComplete="false"
                             name="mobile"
                             onChange={e => setMobile(e.target.value)}
-                            type="text" 
                             />
                         </Form.Group>        
 
                         <div className='row'>
                         <div className='col'>
-                            <Form.Group className="mb-3" id="username">
+                            <Form.Group className="mb-3" controlId='username'>
                                 <Form.Label>Username</Form.Label>
                                 <Form.Control
+                                type="text" 
                                 required
                                 defaultValue={username}
+                                autoComplete="false"
                                 name="username"
                                 onChange={e => setUsername(e.target.value)}
-                                type="text" 
                                 />
                             </Form.Group>                
                         </div>
                         <div className='col'>
-                            <Form.Group className="mb-3" id="password">
+                            <Form.Group className="mb-3" controlId='password'>
                                 <Form.Label>Password</Form.Label>
                                 <Form.Control 
-                                required= {true}
+                                type="password" 
+                                value={currentpassword}
+                                required
+                                autoComplete="false"
                                 defaultValue={currentpassword}
                                 name="current-password"
                                 onChange={e => setcurrentPassword(e.target.value)}
-                                type="password" 
                                 />
                             </Form.Group>        
                         </div>
@@ -271,14 +377,14 @@ function NavMenu() {
                 
                 </Col>
             </Row>
-
+            {/* LOGIN */}
             <Row>
                 <Col>
                     <Modal
+                        backdrop="static"
                         size="sm"
                         show={showlogin}
                         onHide={handleLoginClose}
-                        backdrop="static"
                         keyboard={false}
                         centered>
                         <Modal.Header closeButton className="modal-login">
@@ -286,24 +392,26 @@ function NavMenu() {
                         </Modal.Header>
                         <Modal.Body>
                             <Form autoComplete='off'>
-                            <Form.Group className="mb-3">
+                            <Form.Group className="mb-3" controlId='username'>
                                 <Form.Label>Username</Form.Label>
                                 <Form.Control 
                                 type="text" 
                                 defaultValue={username}
+                                autoComplete="false"
                                 name="username"
                                 onChange={submitUsernameChange}
-                                required = {true} />
+                                required />
                             </Form.Group>                
                     
-                            <Form.Group className="mb-3" id='password'>
+                            <Form.Group className="mb-3" controlId='password'>
                                 <Form.Label>Password</Form.Label>
                                 <Form.Control
                                 type="password" 
                                 defaultValue={currentpassword}
+                                autoComplete="false"
                                 name="currentpassword"
                                 onChange={submitPasswordChange}
-                                required = {true} />
+                                required />
                             </Form.Group>                
                             <Button onClick={clickSubmitLogin} variant="primary" type="submit">
                                 Submit
@@ -318,12 +426,12 @@ function NavMenu() {
             </Row>
             <Row>
             <Col>
-            <Navbar bg="light" expand="lg">
+            <Navbar className='bg-nav' expand="lg">
             <Container fluid>
                 <Navbar.Brand href="/"><img className="logo" src={logo} alt="" /></Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Toggle aria-controls="basic-navbar-nav" className='hamburger' />
                 <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto">
+                <Nav className="me-auto ul-1">
                     <Nav.Link href="/aboutus" className='text-dark'>About Us</Nav.Link>
                     <Nav.Link href="/services" className='text-dark'>Services</Nav.Link>
                     <NavDropdown title="Products" id="products-dropdown">
@@ -339,38 +447,39 @@ function NavMenu() {
                     </NavDropdown>
                 </Nav>
 
-                <Nav className='mr-1'>
+                <Nav className='mr-1 ul-2'>
                     {
-                        usernameSession ? 
+                        !UserNamex ? 
                           <>
-                            <img src={userpicture} className='usrpic' alt="'" />
-                            <NavDropdown className="text-white item-r" title={usernameSession} id="basic-nav-dropdown">
-                            
-                            <NavDropdown.Item onClick={() => handleLogOut()} className='drop-size'>LogOut</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item className='drop-size' as={Link} to="/profile">Profile</NavDropdown.Item>
-                            </NavDropdown>
+                            <Nav.Link onClick={() => setLoginShow(true)} className="text-dark item-r" id="login">Login</Nav.Link>
+                            <Nav.Link onClick={() => setRegisterShow(true)} className="text-dark item-r" id="register">Register</Nav.Link>  
                           </>
                     :
                     <>
-                            <Nav.Link onClick={() => setLoginShow(true)} className="text-dark item-r" id="login">Login</Nav.Link>
-                            <Nav.Link onClick={() => setRegisterShow(true)} className="text-dark item-r" id="register">Register</Nav.Link>  
-                            </>                          
+                            <img src={UserPicture} className='usrpic' alt="'" />
+                            <NavDropdown className="text-white item-r" title={UserNamex} id="basic-nav-dropdown">                            
+                            <NavDropdown.Item onClick={() => handleLogOut()} className='drop-size'>LogOut</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item className='drop-size' as={Link} to="/profile">Profile</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item onClick={() => showChatbox()} className='drop-size' as={Link} to="#">Chat</NavDropdown.Item>
+                            </NavDropdown>
+
+                    </>
                     }
                     
                 </Nav>
 
                 </Navbar.Collapse>
-
             </Container>
 
             </Navbar>
-
             </Col>
             </Row>           
             <Row>
                 <Col>
                   <Modal 
+                    backdrop="static"
                     show={show_2fa} 
                     size="sm"
                     centered
@@ -404,6 +513,98 @@ function NavMenu() {
                 
                 </Col>
             </Row> 
+
+            <Row>
+                <Col>
+                 <Modal 
+                    backdrop="static"
+                    show={showChat} 
+                    size="lg"
+                    centered
+                    onHide={closeChatbox} 
+                    animation={false}>                        
+                    <Modal.Header closeButton className='bg-chat'>
+                    <Modal.Title className='text-white mfa-size'>ONLINE CHAT</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+
+                    <Table className='border-white'>
+                        <tbody>
+                        <tr>
+                            <td style={{backgroundColor: "blanchedalmond", borderRadius: 10, width: 150, textAlign: 'center'}} className="text-center">
+                                <div className="room">{room}</div><br/>
+                                {/* <div className='text-dark w-50 text-center'>{user}</div> */}
+                                <Form.Group className="mb-3 text-dark w-200" controlId="users">
+                                        <Form.Control as="textarea"
+                                            disabled
+                                            defaultValue={user}                                            
+                                            rows={18} />
+                                    </Form.Group> 
+
+                            </td>
+                            <td className='bg-white'>
+                                <Form>
+                                     <Form.Group className="mb-3" id="userInput">
+                                        <Form.Label>Recipient</Form.Label>
+                                        <Form.Control 
+                                        type="text"
+                                        placeholder="Type recipient"
+                                        required
+                                        defaultValue={chatrecipient}
+                                        onChange={e => setChatRecipiend(e.target.value)}
+                                        />
+                                    </Form.Group>
+ 
+
+                                    <Form.Group className="mb-3 text-dark" controlId="messagelist">
+                                        <Form.Control as="textarea"
+                                            disabled
+                                            defaultValue={messagelist}                                            
+                                            rows={12} />
+                                    </Form.Group> 
+                                     <Table>
+                                        <tbody>
+                                            <tr>
+                                            <td className='col-msg'>
+                                                
+                                                    <Form.Group className="mb-3" id="messageInput">
+                                                        <Form.Control 
+                                                        type="text"
+                                                        placeholder='Type a message'
+                                                        required
+                                                        defaultValue={messages}
+                                                        onChange={e => setMesssages(e.target.value)}
+                                                        />
+                                                    </Form.Group>
+
+                                                </td> 
+                                                <td className='col-btn'>
+                                                    <Button className='bg-chat text-white' onClick={e => sendChatmessage(e.target.value)}>
+                                                        Send
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </Table>
+
+                                </Form>
+
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </Table>
+
+
+                    </Modal.Body>
+                    {/* <Modal.Footer>
+                    <div className='w-100 text-left text-danger chat-msg'>{user} has joined the {room}.</div>
+                    </Modal.Footer> */}
+                </Modal>
+                
+                </Col>
+            </Row> 
+
         </Container>
 
         );
